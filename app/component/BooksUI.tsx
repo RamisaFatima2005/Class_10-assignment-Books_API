@@ -8,13 +8,12 @@ interface Book {
 }
 
 export default function BooksUI() {
-  
   const [books, setBooks] = useState<Book[]>([]);
+  const [id, setId] = useState<number | ''>('');
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [editId, setEditId] = useState<number | null>(null);
 
-  // Fetch all books on load
   useEffect(() => {
     fetchBooks();
   }, []);
@@ -25,12 +24,38 @@ export default function BooksUI() {
     setBooks(data);
   };
 
+  const findNextId = () => {
+    const ids = books.map((book) => book.id);
+    let nextId = 1;
+    while (ids.includes(nextId)) {
+      nextId++;
+    }
+    return nextId;
+  };
+
+  const validateAndAddBook = () => {
+    if (id === '' || !title || !author) {
+      alert('All fields are required');
+      return;
+    }
+
+    if (books.some((book) => book.id === id)) {
+      const nextId = findNextId();
+      alert(`ID ${id} already exists. Please use ID ${nextId}`);
+      setId(nextId); // Suggest the next available ID
+      return;
+    }
+
+    addBook();
+  };
+
   const addBook = async () => {
     await fetch('/api/books', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, author }),
+      body: JSON.stringify({ id: Number(id), title, author }),
     });
+    setId('');
     setTitle('');
     setAuthor('');
     fetchBooks();
@@ -42,6 +67,7 @@ export default function BooksUI() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, title, author }),
     });
+    setId('');
     setTitle('');
     setAuthor('');
     setEditId(null);
@@ -59,6 +85,7 @@ export default function BooksUI() {
 
   const handleEdit = (book: Book) => {
     setEditId(book.id);
+    setId(book.id);
     setTitle(book.title);
     setAuthor(book.author);
   };
@@ -67,6 +94,13 @@ export default function BooksUI() {
     <div className="max-w-2xl mx-auto mt-10 p-6 bg-[url('/bg1.jpeg')] h-auto rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6 text-center">Books List</h1>
       <div className="flex flex-col gap-4 mb-6">
+        <input
+          type="number"
+          placeholder="ID"
+          value={id}
+          onChange={(e) => setId(Number(e.target.value))}
+          className="p-2 border border-black rounded-md focus:outline-none focus:ring focus:border-black"
+        />
         <input
           type="text"
           placeholder="Title"
@@ -82,7 +116,7 @@ export default function BooksUI() {
           className="p-2 border border-black rounded-md focus:outline-none focus:ring focus:border-black"
         />
         <button
-          onClick={() => (editId ? updateBook(editId) : addBook())}
+          onClick={() => (editId ? updateBook(editId) : validateAndAddBook())}
           className={`px-4 py-2 rounded-md text-white ${
             editId ? 'bg-amber-900 text-white rounded hover:bg-amber-700 border border-4 border-rose-950' : 'bg-black hover:bg-zinc-800 border border-4 border-black'
           }`}
