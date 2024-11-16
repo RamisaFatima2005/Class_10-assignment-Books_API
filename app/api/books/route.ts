@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 
-let books = [
+const books = [
   { id: 1, title: "Harry Potter and the Sorcerer's Stone", author: "J.K. Rowling" },
   { id: 2, title: "You Are a Badass", author: "Jen Sincero" },
   { id: 3, title: "The Four Agreements", author: "Don Miguel Ruiz" },
   { id: 4, title: "Dare to Lead", author: "Brené Brown" },
 ];
 
-// GET request: Retrieve list of books
+// Retrieve list of books
 
 export async function GET(){
   try{
@@ -20,7 +20,7 @@ export async function GET(){
   }
 }
 
-// POST request: Add a new book
+// Add a new book
 
 export async function POST(request: Request) {
   try {
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 }
 
 
-// PUT request: Update a book by id
+// Update a book by id
 
 export async function PUT(request: Request) {
   try {
@@ -70,7 +70,7 @@ export async function PUT(request: Request) {
   }
 }
 
-// DELETE request: Delete a book by id
+// Delete a book by id
 
 export async function DELETE(request: Request) {
   try {
